@@ -17,10 +17,12 @@ ipython:
 
 # Executa os testes utilizando o pytest.
 test:
-	@.venv/bin/pytest -vv -s tests/
+	@.venv/bin/pytest -s
 
+# Executa os testes no modo watch.
 watch:
-	@.venv/bin/ptw -- -vv -s tests/
+	# @.venv/bin/ptw -- -vv -s
+	@ls **/*.py | entr pytest
 
 # Limpa arquivos não usados e de cache
 clean:

@@ -41,4 +41,4 @@ def main():
 
     # Invoca a função específica para cada valor de argumento passado.
     # Executa a função através da função `globals()`.
-    print(*globals()[args.subcommand](args.filepath), sep="\n")
+    print(*globals()[args.subcommand](args.filepath))
