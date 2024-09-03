@@ -1,4 +1,4 @@
-.PHONY: install virtualenv ipython clean
+.PHONY: install virtualenv ipython clean test
 
 # Comando para instalar as dependências para o ambiente de desenvolvimento.
 install:
@@ -14,6 +14,13 @@ virtualenv:
 # Executa o ipython a partir do ambiente virtual
 ipython:
 	@.venv/bin/ipython
+
+# Executa os testes utilizando o pytest.
+test:
+	@.venv/bin/pytest -vv -s tests/
+
+watch:
+	@.venv/bin/ptw -- -vv -s tests/
 
 # Limpa arquivos não usados e de cache
 clean:
