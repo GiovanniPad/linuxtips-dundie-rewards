@@ -1,0 +1,46 @@
+# Determina o nome dessa action
+name: CI
+
+# Determina em quais ações essa action vai ser executada
+on: 
+    # Ação de push para a branch `main`.
+    push:
+        branches:
+            - "main"
+    # Ação de pull request para a branch `main`.
+    pull_request:
+        branches:
+            - "main"
+
+# Determina quais as tarefas ("trabalhos") que vão ser executadas
+jobs:
+    # Tarefa de testes
+    tests:
+        # Específica a estratégia de testes
+        strategy:
+            # Não para tudo se algo falhar
+            fail-fast: false
+            # Específica em qual versão do Python e SO vai rodar a tarefa de testes
+            matrix:
+                python-version: ['3.10', '3.12']
+                os: [ubuntu-latest]
+        # Determina o tipo de Sistema operacional que vai rodar a tarefa de testes
+        runs-on: ${{matrix.os}}
+        # Passos para realizar a tarefa de testes
+        steps:
+            # Realiza a operação de `checkout` para a branch específicada antes
+            - uses: actions/checkout@v2
+            # Realiza a operação de setar as configurações do Python
+            - uses: actions/setup-python@v2
+              with:
+                  # Específica a versão do Python, executa a configuração para 
+                  # todas as versões definidas do Python anteriormente
+                  python-version: ${{matrix.python-version}}
+            # Específica o nome do passo de instalar o projeto
+            - name: Install Project
+              # Comando para instalar o projeto no modo de testes
+              run: pip install '.[test]'
+              # Específica o nome do passo para rodar os testes
+            - name: Run tests
+              # Comando para realizar os testes, sempre bem definido
+              run: pytest -vv tests integration

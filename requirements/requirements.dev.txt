@@ -1,0 +1,5 @@
+setuptools
+ipython
+ipdb
+pudb
+pytest-watch
