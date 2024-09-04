@@ -2,8 +2,8 @@
 
 # Comando para instalar as dependências para o ambiente de desenvolvimento.
 install:
-	@echo "Hello for dev enviroment"
-	@.venv/bin/activate -m pip install -e '.[dev]'
+	@echo "Installing for dev environment"
+	@.venv/bin/python -m pip install -e '.[test,dev]'
 
 # Cria um ambiente virtual
 virtualenv:

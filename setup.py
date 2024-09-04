@@ -43,6 +43,8 @@ setup(
     long_description_content_type="text/markdown",
     # Autor do programa
     author="Giovanni Padilha",
+    # Específica a versão necessária do Python para o projeto.
+    python_requires=">=3.10",
     # Busca todos os pacotes que tem `__init__.py` no diretório
     packages=find_packages(),
     # Dicionário de entry points, onde a chave é o tipo do entry point e o valor são os caminhos para os entry points.
