@@ -1,5 +1,7 @@
 # Projeto Dundie Rewards
 
+[![CI](https://github.com/GeovannePad/linuxtips-dundie-rewards/actions/workflows/main.yml/badge.svg)](https://github.com/GeovannePad/linuxtips-dundie-rewards/actions/workflows/main.yml)
+
 Projeto da LinuxTips do curso Python Base para aprender Python.
 
 ## Premise
