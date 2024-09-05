@@ -43,4 +43,16 @@ jobs:
               # Específica o nome do passo para rodar os testes
             - name: Run tests
               # Comando para realizar os testes, sempre bem definido
-              run: pytest -vv tests integration
+              run: pytest -v --junitxml-test_result.xml
+              # Publica os resultados dos testes no formato JUnit XML
+              # para cada versão do Python específicada anteriormente
+            - name: publish junit results
+              # Usa um template de outro usuário para executar a action
+              uses: EnricoMi/publish-unit-test-result-action@v2
+              # Indica que sempre vai ser executada
+              if: always()
+              with:
+                # Arquivo que ela vai criar
+                files: test_result.xml
+                # Indica qual a versão do Python de cada teste
+                check_name: Test Result (Python ${{matrix.python-version}})
