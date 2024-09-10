@@ -19,6 +19,11 @@ ipython:
 lint:
 	@.venv/bin/pflake8
 
+# Formato o código com base nos padrões da PEP8
+fmt:
+	@.venv/bin/black dundie tests integration
+	@.venv/bin/isort dundie tests integration
+
 # Executa os testes utilizando o pytest.
 test:
 	@.venv/bin/pytest -s

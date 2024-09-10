@@ -3,6 +3,7 @@ import os
 # setuptools
 from setuptools import setup, find_packages
 
+
 # Função para ler e retornar o conteúdo de arquivos.
 def read(*paths):
     """Read the contents of a text fil safely.
@@ -19,6 +20,7 @@ def read(*paths):
     with open(filepath) as file_:
         return file_.read().strip()
 
+
 # Função para retornar as dependências dos arquivos de requirements.
 def read_requirements(path):
     """Return a list of requirements from a text file."""
@@ -29,6 +31,7 @@ def read_requirements(path):
         # Não insere linhas que não sejam apenas de dependências.
         if not line.startswith(("#", "git+", '"', "-"))
     ]
+
 
 setup(
     # Nome do executável, instalador do projeto
