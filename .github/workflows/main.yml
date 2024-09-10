@@ -19,46 +19,65 @@ permissions:
 
 # Determina quais as tarefas ("trabalhos") que vão ser executadas
 jobs:
-    # Tarefa de testes
-    tests:
-        # Específica a estratégia de testes
-        strategy:
-            # Não para tudo se algo falhar
-            fail-fast: false
-            # Específica em qual versão do Python e SO vai rodar a tarefa de testes
-            matrix:
-                python-version: ['3.10', '3.12']
-                os: [ubuntu-latest]
-        # Determina o tipo de Sistema operacional que vai rodar a tarefa de testes
-        runs-on: ${{matrix.os}}
-        # Passos para realizar a tarefa de testes
-        steps:
-            # Realiza a operação de `checkout` para a branch específicada antes
-            - uses: actions/checkout@v2
-            # Realiza a operação de setar as configurações do Python
-            - uses: actions/setup-python@v2
-              with:
-                  # Específica a versão do Python, executa a configuração para 
-                  # todas as versões definidas do Python anteriormente
-                  python-version: ${{matrix.python-version}}
-            # Específica o nome do passo de instalar o projeto
-            - name: Install Project
-              # Comando para instalar o projeto no modo de testes
-              run: pip install '.[test]'
-              # Específica o nome do passo para rodar os testes
-            - name: Run tests
-              # Comando para realizar os testes, sempre bem definido
-              run: pytest -v --junitxml=test-results.xml
-              # Publica os resultados dos testes no formato JUnit XML
-              # para cada versão do Python específicada anteriormente
-            - name: publish junit results
-              # Usa um template de outro usuário para executar a action
-              uses: EnricoMi/publish-unit-test-result-action@v2
-              # Indica que sempre vai ser executada
-              if: always()
-              with:
-                # Arquivo que ela vai criar
-                files: |
-                  test-results/**/*.xml
-                  test-results/**/*.trx
-                  test-results/**/*.json
+  lint:
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ['3.12']
+        os: [ubuntu-latest]
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{matrix.python-version}}
+      - name: Install Project
+        run: pip install '.[test]'
+      - name: Loop for style errors
+        run: pflake8
+
+  # Tarefa de testes
+  tests:
+    # Os testes só vão rodar se o job lint passar sem erro.
+    needs: lint
+    # Específica a estratégia de testes
+    strategy:
+      # Não para tudo se algo falhar
+      fail-fast: false
+      # Específica em qual versão do Python e SO vai rodar a tarefa de testes
+      matrix:
+        python-version: ['3.10', '3.12']
+        os: [ubuntu-latest]
+    # Determina o tipo de Sistema operacional que vai rodar a tarefa de testes
+    runs-on: ${{matrix.os}}
+    # Passos para realizar a tarefa de testes
+    steps:
+      # Realiza a operação de `checkout` para a branch específicada antes
+      - uses: actions/checkout@v2
+      # Realiza a operação de setar as configurações do Python
+      - uses: actions/setup-python@v2
+        with:
+          # Específica a versão do Python, executa a configuração para 
+          # todas as versões definidas do Python anteriormente
+          python-version: ${{matrix.python-version}}
+      # Específica o nome do passo de instalar o projeto
+      - name: Install Project
+        # Comando para instalar o projeto no modo de testes
+        run: pip install '.[test]'
+        # Específica o nome do passo para rodar os testes
+      - name: Run tests
+        # Comando para realizar os testes, sempre bem definido
+        run: pytest -v --junitxml=test-results.xml
+        # Publica os resultados dos testes no formato JUnit XML
+        # para cada versão do Python específicada anteriormente
+      - name: publish junit results
+        # Usa um template de outro usuário para executar a action
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        # Indica que sempre vai ser executada
+        if: always()
+        with:
+          # Arquivo que ela vai criar
+          files: |
+            test-results/**/*.xml
+            test-results/**/*.trx
+            test-results/**/*.json

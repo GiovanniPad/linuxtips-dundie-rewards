@@ -2,7 +2,7 @@
 import argparse
 
 # Import relativo, procura na mesma pasta do módulo atual.
-from dundie.core import load
+from dundie.core import load # noqa
 
 # Principal função do programa.
 def main():
