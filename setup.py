@@ -3,6 +3,7 @@ import os
 # setuptools
 from setuptools import setup, find_packages
 
+
 # Função para ler e retornar o conteúdo de arquivos.
 def read(*paths):
     """Read the contents of a text fil safely.
@@ -12,12 +13,13 @@ def read(*paths):
     ...
     """
 
-    # Retorna o caminho para pasta em que o arquivo que executa essa linha está.
+    # Retorna o caminho para pasta em que o arquivo que executa essa linha.
     # `__file__` indica o nome do arquivo em questão.
     rootpath = os.path.dirname(__file__)
     filepath = os.path.join(rootpath, *paths)
     with open(filepath) as file_:
         return file_.read().strip()
+
 
 # Função para retornar as dependências dos arquivos de requirements.
 def read_requirements(path):
@@ -29,6 +31,7 @@ def read_requirements(path):
         # Não insere linhas que não sejam apenas de dependências.
         if not line.startswith(("#", "git+", '"', "-"))
     ]
+
 
 setup(
     # Nome do executável, instalador do projeto
@@ -47,8 +50,10 @@ setup(
     python_requires=">=3.10",
     # Busca todos os pacotes que tem `__init__.py` no diretório
     packages=find_packages(),
-    # Dicionário de entry points, onde a chave é o tipo do entry point e o valor são os caminhos para os entry points.
-    # Adicinando uma função `main()` do arquivo `__main__.py` como entry point de linha de console.
+    # Dicionário de entry points, onde a chave é o tipo do entry point e
+    # o valor são os caminhos para os entry points.
+    # Adicinando uma função `main()` do arquivo `__main__.py`
+    # como entry point de linha de console.
     entry_points={
         "console_scripts": [
             "dundie = dundie:__main__.main"

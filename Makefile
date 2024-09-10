@@ -1,4 +1,4 @@
-.PHONY: install virtualenv ipython clean test
+.PHONY: install virtualenv ipython clean test pflake8
 
 # Comando para instalar as dependências para o ambiente de desenvolvimento.
 install:
@@ -14,6 +14,15 @@ virtualenv:
 # Executa o ipython a partir do ambiente virtual
 ipython:
 	@.venv/bin/ipython
+
+# Executa uma análise estática para verificar a escrita do código
+lint:
+	@.venv/bin/pflake8
+
+# Formato o código com base nos padrões da PEP8
+fmt:
+	@.venv/bin/black dundie tests integration
+	@.venv/bin/isort dundie tests integration
 
 # Executa os testes utilizando o pytest.
 test:

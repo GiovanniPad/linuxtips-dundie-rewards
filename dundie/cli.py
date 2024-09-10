@@ -1,8 +1,10 @@
-# Biblioteca padrão do Python para coletar argumentos de CLI de uma forma mais amigável.
+# Biblioteca padrão do Python para coletar argumentos
+# de CLI de uma forma mais amigável.
 import argparse
 
 # Import relativo, procura na mesma pasta do módulo atual.
-from dundie.core import load
+from dundie.core import load  # noqa
+
 
 # Principal função do programa.
 def main():
@@ -25,15 +27,12 @@ def main():
         type=str,
         help="The subcommand to run",
         choices=("load", "show", "send"),
-        default="help"
+        default="help",
     )
 
     # Definindo o segundo argumento da CLI, mesma lógica do anterior.
     parser.add_argument(
-        "filepath",
-        type=str,
-        help="File path to load",
-        default=None
+        "filepath", type=str, help="File path to load", default=None
     )
 
     # Coleta os argumentos do objeto `parser`.
