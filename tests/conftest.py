@@ -16,7 +16,8 @@ def pytest_configure(config):
         config.addinivalue_line("markers", line)
 
 
-# Define uma fixture para criar um diretório temporário para side effects dos testes.
+# Define uma fixture para criar um diretório temporário
+# para os side effects dos testes.
 # `autouse` define que todos os testes desse projeto vão utilizar essa fixture.
 @pytest.fixture(autouse=True)
 def go_to_tmpdir(request):  # injeção de dependências
