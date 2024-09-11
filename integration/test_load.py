@@ -1,8 +1,17 @@
-# Função da biblioteca subprocess para executar comandos CLI
-# do SO e o resultado do comando vem como binário.
-from subprocess import CalledProcessError, check_output
-
 import pytest
+
+# Objeto `CliRunner` do módulo `testing` para realizar testes de integração
+from click.testing import CliRunner
+
+# Importando as funções que serão testadas
+from dundie.cli import load, main
+
+# Importando o caminho do arquivo de pessoas do arquivo de constantes
+from .constants import PEOPLE_FILE
+
+# Cria um objeto do tipo `CliRunner`, que permite através de uma interface,
+# invocar comandos no terminal em um ambiente isolado para teste
+cmd = CliRunner()
 
 
 # Adicionando os markers `integration` e `medium` para o testea abaixo.
@@ -10,13 +19,12 @@ import pytest
 @pytest.mark.medium
 def test_load_positive_call_load_command():
     """Test command load."""
-    out = (
-        check_output(["dundie", "load", "tests/assets/people.csv"])
-        .decode("utf-8")
-        .split("\n")
-    )
+    # Invocando o comando load, passando seus parâmetros e coletando a saída
+    out = cmd.invoke(load, PEOPLE_FILE)
 
-    assert len(out) == 2
+    # Verificando se saída foi correta
+    # Coleta a saída através do `output`
+    assert "Dunder Mifflin Associates" in out.output
 
 
 # Adicionando os markers `integration` e `medium` para o testea abaixo.
@@ -28,11 +36,10 @@ def test_load_positive_call_load_command():
 @pytest.mark.parametrize("wrong_command", ["loady", "carrega", "start"])
 def test_load_negative_call_load_command_with_wrong_params(wrong_command):
     """Test command load."""
-    with pytest.raises(CalledProcessError) as error:
-        (
-            check_output(["dundie", wrong_command, "tests/assets/people.csv"])
-            .decode("utf-8")
-            .split("\n")
-        )
+    # Invoca a função main para testar o subcomando `load`
+    out = cmd.invoke(main, wrong_command, PEOPLE_FILE)
 
-    assert "status 2" in str(error.getrepr())
+    # Verifica se a saída foi um erro
+    assert out.exit_code != 0
+    # Verifica se a saída da mensagem do erro foi correta
+    assert f"No such command '{wrong_command}'." in out.output
