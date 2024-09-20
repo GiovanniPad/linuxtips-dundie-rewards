@@ -1,4 +1,7 @@
 import os
 
-TEST_PATH = os.path.dirname(__file__)
-PEOPLE_FILE = os.path.join(TEST_PATH, "assets/people.csv")
+# Caminho raiz do projeto.
+from dundie.settings import ROOT_PATH
+
+# Coletando o arquivo usado para os testes.
+PEOPLE_FILE = os.path.join(ROOT_PATH, "..", "tests", "assets", "people.csv")
