@@ -24,14 +24,14 @@ fmt:
 	@.venv/bin/black dundie tests integration
 	@.venv/bin/isort dundie tests integration
 
-# Executa os testes utilizando o pytest.
+# Executa os testes utilizando o pytest com forked.
 test:
-	@.venv/bin/pytest -s
+	@.venv/bin/pytest -s --forked
 
-# Executa os testes no modo watch.
+# Executa os testes no modo watch com forked.
 watch:
 	# @.venv/bin/ptw -- -vv -s
-	@ls **/*.py | entr pytest
+	@ls **/*.py | entr pytest --forked
 
 # Limpa arquivos não usados e de cache
 clean:

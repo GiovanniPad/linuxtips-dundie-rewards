@@ -71,7 +71,7 @@ jobs:
         # Específica o nome do passo para rodar os testes
       - name: Run tests
         # Comando para realizar os testes, sempre bem definido
-        run: pytest -v --junitxml=test-results.xml
+        run: pytest -v --junitxml=test-results.xml --forked
         # Publica os resultados dos testes no formato JUnit XML
         # para cada versão do Python específicada anteriormente
       - name: publish junit results

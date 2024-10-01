@@ -65,7 +65,7 @@ def load(filepath):
     # atribui um nome a tabela utilizando `title`
     table = Table(title="Dunder Mifflin Associates")
     # Colunas da tabela
-    headers = ["name", "dept", "role", "e-mail"]
+    headers = ["name", "dept", "role", "created", "e-mail"]
 
     # Adiciona coluna por coluna na tabela
     for header in headers:
@@ -77,8 +77,9 @@ def load(filepath):
     # Adiciona para cada pessoa, uma linha contendo seus dados
     # Cada campo terá sua respectiva coluna
     for person in result:
-        # List comprehension para remover espaços em branco de cada campo
-        table.add_row(*[field.strip() for field in person.split(",")])
+        # List comprehension para coletar do dicionário `person`
+        # os campos e convertê-los em string.
+        table.add_row(*[str(value) for value in person.values()])
 
     # Cria um objeto do tipo `Console` para coletar as informações do terminal
     console = Console()
