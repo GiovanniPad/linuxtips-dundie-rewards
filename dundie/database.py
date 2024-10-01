@@ -80,8 +80,8 @@ def add_person(db, pk, data):
         # Atribui um saldo inicial de pontos.
         set_initial_balance(db, pk, person)
 
-        # Gera um senha aleatória.
-        password = generate_simple_password(8)
+        # Atribui a variável a senha inicial gerada do usuário.
+        password = set_initial_password(db, pk)
 
         # Envia um e-mail contendo a senha gerada.
         send_email(EMAIL_FROM, pk, "Your dundie password", password)
@@ -89,6 +89,18 @@ def add_person(db, pk, data):
 
     # Retorna os dados atualizados da pessoa e se foi criado um registro novo.
     return person, created
+
+
+# Função para criar uma senha inicial para um novo usuário.
+def set_initial_password(db, pk):
+    """Generated and saves password."""
+    # Coleta o email do usuário (chave primária), senão encontrar
+    # retorna um dicionário vazio por padrão.
+    db["user"].setdefault(pk, {})
+    # Gera uma senha para o usuário e atribui aos seus dados no banco de dados.
+    db["user"][pk]["password"] = generate_simple_password(8)
+    # Retorna a senha criada
+    return db["user"][pk]["password"]
 
 
 # Função para definir o balanço de pontos inicial.
