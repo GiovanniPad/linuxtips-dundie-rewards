@@ -1,8 +1,7 @@
 # Biblioteca para acessar as informações do pacote de distribuição do app
-import pkg_resources
-
 # Biblioteca do pacote `rich` para a biblioteca `click`, que
 # estiliza a linha de comando (CLI).
+import pkg_resources
 import rich_click as click
 
 # Módulo da biblioteca `rich` para definir um Console e
