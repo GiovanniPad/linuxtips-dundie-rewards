@@ -1,10 +1,12 @@
 """Core module of dundie"""
 
+import os
+
 # Função da biblioteca stdlib para ler arquivos .csv.
 from csv import reader
 
 # Funções para do módulo para manipulação do banco de dados.
-from dundie.database import add_person, commit, connect
+from dundie.database import add_movement, add_person, commit, connect
 
 # Função do módulo de log para definir um logger.
 from dundie.utils.log import get_logger
@@ -101,4 +103,12 @@ def read(**query):
 
 def add(value, **query):
     """Add value to each record on query."""
-    pass
+    people = read(**query)
+    if not people:
+        raise RuntimeError("Not Found")
+
+    db = connect()
+    user = os.getenv("USER")
+    for person in people:
+        add_movement(db, person["email"], value, user)
+    commit(db)
