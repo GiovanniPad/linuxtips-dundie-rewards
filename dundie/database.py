@@ -118,6 +118,13 @@ def set_initial_balance(db, pk, person):
 
 # Função para criar uma movimentação de saldo
 def add_movement(db, pk, value, actor="system"):
+    """Adds movement to user account.
+
+    Example::
+
+        add_movement(db, "me@me.com", 100, "me")
+
+    """
     # Coleta todas as movimentações da pessoa em questão,
     # caso não tiver nenhuma movimentação, retorna uma lista vazia.
 
