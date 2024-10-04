@@ -35,9 +35,9 @@ def read_requirements(path):
 
 setup(
     # Nome do executável, instalador do projeto
-    name="dundie",
+    name="giovannipad-dundie",
     # Versão do projeto, segue o padrão Semantic Versioning
-    version="0.1.0",
+    version="0.1.1",
     # Descrição do projeto
     description="Reward point system for Dunder Mifflin",
     # Descrição completa do projeto, funciona como uma "documentação".
@@ -48,8 +48,12 @@ setup(
     author="Giovanni Padilha",
     # Específica a versão necessária do Python para o projeto.
     python_requires=">=3.10",
-    # Busca todos os pacotes que tem `__init__.py` no diretório
-    packages=find_packages(),
+    # Busca todos os pacotes que tem `__init__.py` no diretório e
+    # exclui a pasta `integration`
+    packages=find_packages(exclude=["integration"]),
+    # Específica para o setup que arquivos com a extensão diferente de .py
+    # vão ser instalados
+    include_package_data=True,
     # Dicionário de entry points, onde a chave é o tipo do entry point e
     # o valor são os caminhos para os entry points.
     # Adicinando uma função `main()` do arquivo `__main__.py`

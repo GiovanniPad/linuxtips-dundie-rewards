@@ -14,5 +14,9 @@ isort
 # docs
 mkdocs
 
+# build
+wheel
+twine
+
 # Install project as editable
 -e .

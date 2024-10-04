@@ -1,9 +1,12 @@
-# Biblioteca para acessar as informações do pacote de distribuição do app
-# Biblioteca do pacote `rich` para a biblioteca `click`, que
-# estiliza a linha de comando (CLI).
+# Biblioteca para manipular arquivos json.
 import json
 
-import pkg_resources
+# Biblioteca para acessar as informações do pacote de distribuição do app,
+# substitui o pkg_resources.
+from importlib.metadata import metadata
+
+# Biblioteca do pacote `rich` para a biblioteca `click`, que
+# estiliza a linha de comando (CLI).
 import rich_click as click
 
 # Módulo da biblioteca `rich` para definir um Console e
@@ -35,8 +38,9 @@ click.rich_click.APPEND_METAVARS_HELP = True
 # Decorator `@click.group()` indica que a função `main` como grupo principal
 # de comandos
 @click.group()
-# Adiciona o subcomando `--version` para verificar a versão do app
-@click.version_option(pkg_resources.get_distribution("dundie").version)
+# Adiciona o subcomando `--version` para verificar a versão do app.
+# `metadata` coleta a versão do arquivo `setup.py`.
+@click.version_option(metadata("giovannipad-dundie").get("version"))
 # Principal função do aplicativo
 def main():
     """Dunder Mifflin Rewards System

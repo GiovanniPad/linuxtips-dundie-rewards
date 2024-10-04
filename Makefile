@@ -1,4 +1,4 @@
-.PHONY: install virtualenv ipython clean test pflake8
+.PHONY: install virtualenv ipython clean test pflake8 docs docs-serve build publish-test publish
 
 # Comando para instalar as dependências para o ambiente de desenvolvimento.
 install:
@@ -48,3 +48,23 @@ clean:
 	@rm -rf htmlcov
 	@rm -rf .tox/
 	@rm -rf docs/_build
+
+# Gera a pasta contendo a documentação web
+docs:
+	@.venv/bin/mkdocs build --clean
+
+# Abre um servidor local para visualizar a documentação web
+docs-serve:
+	@.venv/bin/mkdocs serve
+
+# Gera os arquivos de build do projeto, em wheel e tar gz
+build:
+	@python setup.py sdist bdist_wheel
+
+# Publica o projeto no repositório de pacotes de teste
+publish-test:
+	@twine upload --repository testpypi dist/*
+
+# Publica o projeto no repositório oficial
+publish:
+	@twine upload dist/*
