@@ -6,10 +6,11 @@ from datetime import datetime
 # Biblioteca para representar o tipo de dado `Decimal`
 from decimal import Decimal
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 # Função para validar emails do módulo `email`
 from dundie.utils.email import check_valid_email
+from dundie.utils.user import generate_simple_password
 
 
 # Classe personalizada de erro
@@ -58,7 +59,7 @@ class Balance(BaseModel):
     # porém essa validação ocorre antes de instanciar a classe
     @field_validator("value", mode="after")
     def value_logic(cls, v):
-        return Decimal(v) * 2
+        return Decimal(v)
 
     # Classe interna para configurar como é a representação do JSON
     # dos atributos da classe principal
@@ -76,3 +77,11 @@ class Movement(BaseModel):
     date: datetime
     actor: str
     value: Decimal
+
+
+class User(BaseModel):
+    person: Person
+    password: str = Field(default_factory=generate_simple_password)
+
+    class Config:
+        json_encoders = {Person: lambda p: p.pk}

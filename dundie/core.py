@@ -4,20 +4,24 @@ import os
 
 # Função da biblioteca stdlib para ler arquivos .csv.
 from csv import reader
+from typing import Any, Dict, List
 
 # Funções para do módulo para manipulação do banco de dados.
 from dundie.database import add_movement, add_person, commit, connect
+from dundie.models import Balance, Movement, Person
 
 # Função do módulo de log para definir um logger.
 from dundie.utils.log import get_logger
 
 # Definindo um logger personalizado e atribuindo-o a uma variável.
 log = get_logger()
+Query = Dict[str, Any]
+ResultDict = List[Dict[str, Any]]
 
 
 # Função para carregar dados.
 # Chamada ao ser passada para o argumento `subcommand` o valor "load".
-def load(filepath):
+def load(filepath: str) -> ResultDict:
     """Loads data from filepath to the database
 
     >>> len(load('assets/people.csv'))
@@ -53,20 +57,16 @@ def load(filepath):
         # Função `dict` converte o objeto zip para um dicionário e
         # armazena numa variável.
         person_data = dict(zip(headers, [item.strip() for item in line]))
-        # Coleta e atribui a uma variável a chave primária (email) e
-        # a remove do dicionário.
-        pk = person_data.pop("email")
-        # Executa a função para adicionar cada uma dessas pessoas
-        # no banco de dados, retornando os dados da pessoa e
-        # se ela foi criada ou não.
-        person, created = add_person(db, pk, person_data)
 
-        # Faz uma cópia dos dados da pessoa e atribui a uma variável.
-        return_data = person.copy()
+        instance = Person(pk=person_data.pop("email"), **person_data)
+
+        person, created = add_person(db, instance)
+        return_data = person.model_dump(exclude={"pk"})
+
         # Insere na cópia dos dados a informação se ela foi criada ou não.
         return_data["created"] = created
         # Reinsere na cópia dos dados seu email (chave primária).
-        return_data["email"] = pk
+        return_data["email"] = person.pk
         # Adiciona a cópia dos dados dessa pessoa na lista vazia de exibição.
         people.append(return_data)
 
@@ -76,39 +76,42 @@ def load(filepath):
     return people
 
 
-def read(**query):
+def read(**query: Query) -> ResultDict:
     """Read data from db and filters using query"""
+    query = {k: v for k, v in query.items() if v is not None}
     db = connect()
     return_data = []
-    for pk, data in db["people"].items():
 
-        dept = query.get("dept")
-        if dept and dept != data["dept"]:
-            continue
+    if "email" in query:
+        query["pk"] = query.pop("email")
 
-        if (email := query.get("email")) and email != pk:
-            continue
-
+    for person in db[Person].filter(**query):
         return_data.append(
             {
-                "email": pk,
-                "balance": db["balance"][pk],
-                "last_movement": db["movement"][pk][-1]["date"],
-                **data,
+                "email": person.pk,
+                "balance": db[Balance].get_by_pk(person.pk).value,
+                "last_movement": db[Movement]
+                .filter(person__pk=person.pk)[-1]
+                .date,
+                **person.model_dump(exclude={"pk"}),
             }
         )
-
     return return_data
 
 
-def add(value, **query):
+def add(value: int, **query: Query):
     """Add value to each record on query."""
+    query = {k: v for k, v in query.items() if v is not None}
     people = read(**query)
+
     if not people:
         raise RuntimeError("Not Found")
 
     db = connect()
     user = os.getenv("USER")
+
     for person in people:
-        add_movement(db, person["email"], value, user)
+        instance = db[Person].get_by_pk(person["email"])
+        add_movement(db, instance, value, user)
+
     commit(db)
