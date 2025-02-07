@@ -64,7 +64,7 @@ class Balance(BaseModel):
     # Classe interna para configurar como é a representação do JSON
     # dos atributos da classe principal
     class Config:
-        # Define que o atributi `person` será um objeto que exibirá apenas
+        # Define que o atributo `person` será um objeto que exibirá apenas
         # o atributo `nome`, para isso é necessário passar uma função
         json_encoders = {Person: lambda p: p.name}
 
@@ -79,9 +79,18 @@ class Movement(BaseModel):
     value: Decimal
 
 
+# Classe para representar a entidade `User` do banco de dados
+# Também herda de `BaseModel` para usar as funcionalidades do Pydantic
 class User(BaseModel):
+    # Atributos e seus tipos de dados
     person: Person
+    # Permite configurável o atributo, neste caso `default_factory` executa
+    # por padrão a função `generate_simple_password` para toda instância
     password: str = Field(default_factory=generate_simple_password)
 
+    # Classe interna para configurar como é a representação do JSON
+    # dos atributos da classe principal
     class Config:
+        # Define que o atributo `person` será um objeto que exibirá apenas
+        # o atributo `nome`, para isso é necessário passar uma função
         json_encoders = {Person: lambda p: p.pk}

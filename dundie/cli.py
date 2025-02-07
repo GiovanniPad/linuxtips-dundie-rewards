@@ -92,50 +92,122 @@ def load(filepath):
     console.print(table)
 
 
+# Decorator que define a função `show` como um subcomando de `main`
 @main.command()
+# Indica uma opção `--dept` que é opcional ao executar o comando
+# Esta opção é o departamento que será feito a busca por funcionários para
+# exibir
 @click.option("--dept", required=False)
+# Indica uma opção `--email` que é opcional ao executar o comando
+# Esta opção é o email do funcionário a ser procurado e exibido
 @click.option("--email", required=False)
+# Indica uma opção `--output` e seu valor padrão é `None`
+# Esta opção é o arquivo que será usado para armazenar os dados da busca
 @click.option("--output", default=None)
+# Função que mostra informações sobre usuários
+# `output` indica o arquivo de saída
+# `query` indica a consulta que será realizada
 def show(output, **query):
     """Shows information about users."""
+
+    # Invoca o método `read` para realizar a busca com base na `query` inserida
+    # e armazena o resultado em uma variável
     result = core.read(**query)
+
+    # Verifica se o argumento `output` foi inserido,
+    # caso sim, escreve o resultado no arquivo específicado
     if output:
+        # Abre o gerenciador de contextos de arquivos no modo escrita `w`
+        # `output_file` representa o arquivo no contexto
         with open(output, "w") as output_file:
+            # Converte de um objeto para uma string JSON formatada e escreve
+            # no arquivo
             output_file.write(json.dumps(result))
 
+    # Verifica se nada foi encontrado
     if not result:
         print("Nothing to show.")
 
+    # Cria uma tabela de console da biblioteca rich
     table = Table(title="Dunder Mifflin Associates")
+
+    # Itera sobre os nomes das chaves do ResultDict
     for key in result[0]:
+        # Cria uma coluna para cada chave, com seu nome
+        # `title()` define a primeira letra como maiúscula
+        # `replace()` substitui a string `_` por uma string vazia.
+        # `style` define a cor de estilo da coluna
         table.add_column(key.title().replace("_", ""), style="magenta")
 
+    # Itera sobre cada pessoa no dicionário `result`
     for person in result:
+        # Adiciona uma linha para cada pessoa encontrada
+        # List Comprehension que percorre cada valor do dicionário `person`
+        # `values()` retorna apenas os valores de cada chave do dicionário
+        # Por fim desempacota a lista com `*`
         table.add_row(*[str(value) for value in person.values()])
 
+    # Cria uma interface de console do rich de alto nível
     console = Console()
+    # Imprime a tabela no console do rich
     console.print(table)
 
 
+# Define a função `add` como subcomando da `main`
 @main.command()
+# Indica um argumento `value` necessário para o subcomando,
+# esse argumento é do tipo `int` e é obrigatório
 @click.argument("value", type=click.INT, required=True)
+# Indica uma opção `--dept` opcional do subcomando
+# Essa opção permite especificar o departamento que será usado no subcomando
 @click.option("--dept", required=False)
+# Indica uma opção `--email` opcional do subcomando
+# Essa opção permite especificar o email do funcionário que será usado
 @click.option("--email", required=False)
+# Passa por injeção de dependência o contexto do script atual, isso permite
+# ter acesso a outros subcomandos dentro dessa função
 @click.pass_context
+# Função para adicionar pontos para um usuário ou departamento
+# `ctx` indica o contexto passado por `pass_context`
+# `value` indica a quantia de pontos a serem adicionados
+# `query` indica quais usuários vão receber os pontos
 def add(ctx, value, **query):
     """Add points to the user or dept."""
 
+    # Executa a função de adicionar pontos no banco de dados
+    # A `query` é desempacotada com `**`, pois ela é um dicionário
     core.add(value, **query)
+    # Invoca através do contexto o subcomando `show` passando a mesma `query`
+    # para mostrar o(s) usuário(s) que foram alterados
     ctx.invoke(show, **query)
 
 
+# Indica que `remove` é um subcomando de `main`
 @main.command()
+# Indica um argumento `value` necessário para o subcomando,
+# esse argumento é do tipo `int` e é obrigatório
 @click.argument("value", type=click.INT, required=True)
+# Indica uma opção `--dept` opcional do subcomando
+# Essa opção permite especificar o departamento que será usado no subcomando
 @click.option("--dept", required=False)
+# Indica uma opção `--email` opcional do subcomando
+# Essa opção permite especificar o email do funcionário que será usado
 @click.option("--email", required=False)
+# Passa por injeção de dependência o contexto do script atual, isso permite
+# ter acesso a outros subcomandos dentro dessa função
 @click.pass_context
+# Função que remove pontos do usuário ou departamento
+# `ctx` indica o contexto passado por `pass_context`
+# `value` indica a quantia de pontos a serem deduzidos
+# `query` indica quais usuários vão ter os pontos deduzidos
 def remove(ctx, value, **query):
-    """Add points to the user or dept."""
+    """Remove points from the user or dept."""
 
+    # Usa a mesma função para adicionar pontos do banco de dados, porém
+    # o valor é multiplicado por `-1` para ser negativo e deduzir do total
+    # A `query` é desempacotada com `**`, pois ela é um dicionário
     core.add(value * -1, **query)
+
+    # Invoca através do contexto o subcomando `show` passando a mesma `query`
+    # para mostrar o(s) usuário(s) que foram alterados
     ctx.invoke(show, **query)
