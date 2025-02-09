@@ -14,143 +14,166 @@
             "name": "Gabe Lewis",
             "dept": "C-Level",
             "role": "CEO"
+        },
+        "pam@dm.com": {
+            "name": "Pam Beasly",
+            "dept": "General",
+            "role": "Receptionist"
         }
     },
     "balance": {
-        "jim@dundlermifflin.com": 800,
-        "schrute@dundlermifflin.com": 350,
-        "glewis@dundermifflin.com": 100
+        "jim@dundlermifflin.com": "800",
+        "schrute@dundlermifflin.com": "350",
+        "glewis@dundermifflin.com": "100",
+        "pam@dm.com": "500"
     },
     "movement": {
         "jim@dundlermifflin.com": [
             {
                 "date": "2024-10-01T17:58:08.751045",
                 "actor": "system",
-                "value": 500
+                "value": "500"
             },
             {
                 "date": "2024-10-02T20:44:10.774327",
                 "actor": "geovannepad",
-                "value": 30
+                "value": "30"
             },
             {
                 "date": "2024-10-02T20:44:25.154520",
                 "actor": "geovannepad",
-                "value": 332
+                "value": "332"
             },
             {
                 "date": "2024-10-02T20:44:44.728215",
                 "actor": "geovannepad",
-                "value": 100
+                "value": "100"
             },
             {
                 "date": "2024-10-02T20:51:06.795918",
                 "actor": "geovannepad",
-                "value": -62
+                "value": "-62"
             },
             {
                 "date": "2024-10-02T20:52:29.902297",
                 "actor": "geovannepad",
-                "value": 5
+                "value": "5"
             },
             {
                 "date": "2024-10-02T20:52:33.562213",
                 "actor": "geovannepad",
-                "value": 5
+                "value": "5"
             },
             {
                 "date": "2024-10-02T20:52:42.766490",
                 "actor": "geovannepad",
-                "value": -10
+                "value": "-10"
             },
             {
                 "date": "2024-10-02T21:01:12.324539",
                 "actor": "geovannepad",
-                "value": -50
+                "value": "-50"
             },
             {
                 "date": "2024-10-02T21:01:22.046622",
                 "actor": "geovannepad",
-                "value": -50
+                "value": "-50"
             },
             {
                 "date": "2024-10-02T21:01:26.408197",
                 "actor": "geovannepad",
-                "value": -50
+                "value": "-50"
             },
             {
                 "date": "2024-10-02T21:01:30.722440",
                 "actor": "geovannepad",
-                "value": 50
+                "value": "50"
             }
         ],
         "schrute@dundlermifflin.com": [
             {
                 "date": "2024-10-01T17:58:08.753297",
                 "actor": "system",
-                "value": 100
+                "value": "100"
             },
             {
                 "date": "2024-10-02T20:44:10.774337",
                 "actor": "geovannepad",
-                "value": 30
+                "value": "30"
             },
             {
                 "date": "2024-10-02T20:44:25.154532",
                 "actor": "geovannepad",
-                "value": 332
+                "value": "332"
             },
             {
                 "date": "2024-10-02T20:51:06.795930",
                 "actor": "geovannepad",
-                "value": -62
+                "value": "-62"
             },
             {
                 "date": "2024-10-02T20:52:29.902308",
                 "actor": "geovannepad",
-                "value": 5
+                "value": "5"
             },
             {
                 "date": "2024-10-02T20:52:33.562224",
                 "actor": "geovannepad",
-                "value": 5
+                "value": "5"
             },
             {
                 "date": "2024-10-02T20:52:42.766501",
                 "actor": "geovannepad",
-                "value": -10
+                "value": "-10"
             },
             {
                 "date": "2024-10-02T21:01:22.046634",
                 "actor": "geovannepad",
-                "value": -50
+                "value": "-50"
             },
             {
                 "date": "2024-10-02T21:01:26.408210",
                 "actor": "geovannepad",
-                "value": -50
+                "value": "-50"
             },
             {
                 "date": "2024-10-02T21:01:30.722452",
                 "actor": "geovannepad",
-                "value": 50
+                "value": "50"
             }
         ],
         "glewis@dundermifflin.com": [
             {
                 "date": "2024-10-01T17:58:08.753629",
                 "actor": "system",
-                "value": 100
+                "value": "100"
             },
             {
                 "date": "2024-10-02T21:01:26.408213",
                 "actor": "geovannepad",
-                "value": -50
+                "value": "-50"
             },
             {
                 "date": "2024-10-02T21:01:30.722455",
                 "actor": "geovannepad",
-                "value": 50
+                "value": "50"
+            }
+        ],
+        "pam@dm.com": [
+            {
+                "date": "2025-02-01T22:25:59.031786",
+                "actor": "system",
+                "value": "500"
+            },
+            {
+                "date": "2025-02-01T22:28:55.684537",
+                "actor": "giovannipad",
+                "value": "100"
+            },
+            {
+                "date": "2025-02-01T22:29:10.611477",
+                "actor": "giovannipad",
+                "value": "-100"
             }
         ]
     },
@@ -163,6 +186,9 @@
         },
         "glewis@dundermifflin.com": {
             "password": "BzEXdjDc"
+        },
+        "pam@dm.com": {
+            "password": "CmNpH24I"
         }
     }
 }

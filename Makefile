@@ -17,12 +17,13 @@ ipython:
 
 # Executa uma análise estática para verificar a escrita do código
 lint:
+	@.venv/bin/mypy --ignore-missing-imports dundie
 	@.venv/bin/pflake8
 
 # Formato o código com base nos padrões da PEP8
 fmt:
+	@.venv/bin/isort --profile=black -m 3 dundie tests integration
 	@.venv/bin/black dundie tests integration
-	@.venv/bin/isort dundie tests integration
 
 # Executa os testes utilizando o pytest com forked.
 test:
