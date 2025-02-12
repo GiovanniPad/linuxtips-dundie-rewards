@@ -1,5 +1,7 @@
 from unittest.mock import patch
 import pytest
+from sqlmodel import create_engine
+from dundie import models
 
 MARKER = """\
 unit: Mark unit tests
@@ -46,11 +48,15 @@ def setup_testing_database(request):
     tmpdir = request.getfixturevalue("tmpdir")
 
     # Coleta o filepath para o arquivo de banco de dados de testes.
-    test_db = str(tmpdir.join("database.test.json"))
+    test_db = str(tmpdir.join("database.test.db"))
+
+    engine = create_engine(f"sqlite:///{test_db}")
+
+    models.SQLModel.metadata.create_all(bind=engine)
 
     # Aplica essa fixture para todas as vezes que a
     # variável `DATABASE_PATH` for utilizada no programa.
     # É utilizado a técnica mocking para substituir temporariamente o filepath
     # principal do banco de dados pelo o filepath de testes.
-    with patch("dundie.database.DATABASE_PATH", test_db):
+    with patch("dundie.database.engine", engine):
         yield

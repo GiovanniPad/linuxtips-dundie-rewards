@@ -70,7 +70,7 @@ def load(filepath):
     # atribui um nome a tabela utilizando `title`
     table = Table(title="Dunder Mifflin Associates")
     # Colunas da tabela
-    headers = ["name", "dept", "role", "created", "e-mail"]
+    headers = ["email", "name", "dept", "role", "created"]
 
     # Adiciona coluna por coluna na tabela
     for header in headers:

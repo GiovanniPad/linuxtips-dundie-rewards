@@ -3,3 +3,5 @@ click
 rich
 rich-click
 pydantic
+sqlalchemy
+sqlmodel
