@@ -21,6 +21,8 @@ from dundie.utils.db import add_movement, add_person
 # Função do módulo de log para definir um logger
 from dundie.utils.log import get_logger
 
+from dundie.utils.exchange import get_rates
+
 # Definindo um logger personalizado e atribuindo-o a uma variável
 log = get_logger()
 
@@ -55,7 +57,7 @@ def load(filepath: str) -> ResultDict:
     # Cria uma lista de pessoas vazia que será usada para exibir no console.
     people = []
     # Lista que contêm o cabeçalho/colunas de dados.
-    headers = ["name", "dept", "role", "email"]
+    headers = ["name", "dept", "role", "email", "currency"]
 
     # Conecta no banco de dados
     with get_session() as session:
@@ -115,12 +117,15 @@ def read(**query: Query) -> ResultDict:
         sql = sql.where(*query_statements)
 
     with get_session() as session:
+        currencies = session.exec(
+            select(Person.currency).distinct(Person.currency)
+        )
+        rates = get_rates(currencies)
 
         results = session.exec(sql)
 
         for person in results:
-            # Para cada pessoa retornada adiciona na
-            # lista `return_data` seus dados
+            total = rates[person.currency].value * person.balance.value
 
             movements = session.exec(
                 select(Movement).where(Movement.person_id == person.id)
@@ -132,6 +137,7 @@ def read(**query: Query) -> ResultDict:
                     "balance": person.balance.value,
                     "last_movement": movements[-1].date.strftime(DATEFMT),
                     **person.model_dump(exclude={"id"}),
+                    **{"value": total}
                 }
             )
 

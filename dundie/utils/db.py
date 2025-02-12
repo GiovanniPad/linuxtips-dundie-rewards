@@ -44,6 +44,7 @@ def add_person(session: Session, instance: Person):
 
         existing.dept = instance.dept
         existing.role = instance.role
+        existing.currency = instance.currency
         session.add(existing)
 
         return instance, created
