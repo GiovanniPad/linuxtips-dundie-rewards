@@ -16,4 +16,10 @@ EMAIL_FROM: str = "master@dundie.com"
 # Caminho raiz do app
 ROOT_PATH: str = os.path.dirname(__file__)
 # Caminho do banco de dados principal
-DATABASE_PATH: str = os.path.join(ROOT_PATH, "..", "assets", "database.json")
+DATABASE_PATH: str = os.path.join(ROOT_PATH, "..", "assets", "database.db")
+
+SQL_CON_STRING: str = f"sqlite:///{DATABASE_PATH}"
+
+DATEFMT: str = "%d/%m/%Y %H:%M:%S"
+
+API_BASE_URL = "https://economia.awesomeapi.com.br/json/last/USD-{currency}"

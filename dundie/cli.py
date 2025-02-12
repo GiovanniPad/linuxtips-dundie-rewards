@@ -70,7 +70,7 @@ def load(filepath):
     # atribui um nome a tabela utilizando `title`
     table = Table(title="Dunder Mifflin Associates")
     # Colunas da tabela
-    headers = ["name", "dept", "role", "created", "e-mail"]
+    headers = ["email", "name", "dept", "role", "currency", "created"]
 
     # Adiciona coluna por coluna na tabela
     for header in headers:
@@ -141,10 +141,8 @@ def show(output, **query):
 
     # Itera sobre cada pessoa no dicionário `result`
     for person in result:
-        # Adiciona uma linha para cada pessoa encontrada
-        # List Comprehension que percorre cada valor do dicionário `person`
-        # `values()` retorna apenas os valores de cada chave do dicionário
-        # Por fim desempacota a lista com `*`
+        person["value"] = f"{person["value"]:.2f}"
+        person["balance"] = f"{person["balance"]:.2f}"
         table.add_row(*[str(value) for value in person.values()])
 
     # Cria uma interface de console do rich de alto nível
