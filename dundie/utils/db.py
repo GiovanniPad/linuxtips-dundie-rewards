@@ -50,7 +50,6 @@ def add_person(session: Session, instance: Person):
         return instance, created
 
 
-# Função para criar uma senha inicial para um novo usuário.
 def set_initial_password(session: Session, instance: Person) -> str:
     """Generated and saves password."""
     user = User(person=instance)
@@ -58,18 +57,14 @@ def set_initial_password(session: Session, instance: Person) -> str:
     return user.password
 
 
-# Função para definir o balanço de pontos inicial.
 def set_initial_balance(session: Session, person: Person):
     """Add movement and set initial balance"""
-    # Adiciona 100 pontos se a pessoa tiver o cargo `Manager`
-    # e adiciona 500 pontos para os outros cargos
+
     value = 100 if person.role == "Manager" else 500
 
-    # Adiciona essa transação de pontos a seu histórico de transações
     add_movement(session, person, Decimal(value))
 
 
-# Função para criar uma movimentação de saldo
 def add_movement(
     session: Session,
     person: Person,

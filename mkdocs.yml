@@ -1,5 +1,3 @@
-# Nome do site da documentação
 site_name: Dundie Rewards CLI
-# Define o tema do site da documentação
 theme:
   name: readthedocs

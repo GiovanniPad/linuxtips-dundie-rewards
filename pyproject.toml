@@ -7,9 +7,8 @@ testpaths = [
 ]
 
 [tool.flake8]
-exclude = [".venv", "build"]
+exclude = [".venv", "build", "migrations"]
 max-line-length = 79
-#extend-ignore = "W293"
 
 [tool.black]
 line-length = 79
@@ -27,28 +26,10 @@ exclude = '''
 '''
 
 [tool.isort]
-# Define o formato de linhas múltiplas para imports longos
-# 3 é o estilo vertical com cada import em uma linha separada dentro de parênteses
+skip=["migrations"]
 multi_line_output = 3
-
-# Adiciona uma vírgula no final das listas de improts multilinhas
-# Melhora a compatibilidade com formatadores como `black` e
-# facilita a adição/remoção de itens
 include_trailing_comma = true
-
-# Força com que os imports sejam quebrados em linhas,
-# com base em sua quantidade e não importando o número de linhas
-# Por ser 0, apenas o tamanho da linha será considerado para a quebra
 force_grid_wrap = 0
-
-# Substitui a barra invertida por parênteses na continuação de linhas
-# ao chegar no limite do tamanho da linha
-# Afeta apenas como linhas individuais que são muito grande são exibidas,
-# não afeta seções de múltiplos imports
 use_parentheses = true
-
-# Insere uma linha em branco antes de um comentário seguido de um import
 ensure_newline_before_comments = true
-
-# Define o tamanho máximo permitido para linhas de imports
 line_length = 79
