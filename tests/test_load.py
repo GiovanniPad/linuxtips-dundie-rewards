@@ -1,31 +1,35 @@
 import pytest
 
 from dundie.core import load
-from dundie.database import EMPTY_DB, ORM, connect
 
-from .constants import PEOPLE_FILE
-
-
-@pytest.mark.unit
-@pytest.mark.high
-def test_load_positive_has_2_people():
-    """Test load function."""
-    assert len(load(PEOPLE_FILE)) == 2
+from .constants import TEST_PEOPLE_FILE
 
 
 @pytest.mark.unit
 @pytest.mark.high
-def test_db_schema():
-    load(PEOPLE_FILE)
+def test_load_positive_insert_three_people():
+    """
+    Test if load function insert three people to the database
+    """
 
-    db = connect()
-    db_keys = {ORM.get_table_name(model) for model in db}
-
-    assert db_keys == EMPTY_DB.keys()
+    people = load(TEST_PEOPLE_FILE)
+    assert len(people) == 3
 
 
 @pytest.mark.unit
 @pytest.mark.high
-def test_load_positive_first_name_is_jim_halpert():
-    """Test load function."""
-    assert load(PEOPLE_FILE)[0]["name"] == "Jim Halpert"
+def test_load_positive_created_first_person():
+    """
+    Test if load function created the first person in people file.
+    """
+    test_person = {
+        "name": "Jim Halpert",
+        "dept": "Sales",
+        "role": "Salesman",
+        "email": "jim@dundlermifflin.com",
+        "currency": "USD",
+        "created": True,
+    }
+
+    first_person = load(TEST_PEOPLE_FILE)[0]
+    assert test_person == first_person

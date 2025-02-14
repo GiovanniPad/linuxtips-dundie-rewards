@@ -1,32 +1,35 @@
+from decimal import Decimal
+
 import pytest
+from sqlmodel import select
 
 from dundie.core import add
-from dundie.database import add_person, commit, connect
-from dundie.models import Balance, Person
+from dundie.database import get_session
+from dundie.models import Balance
+from dundie.utils.db import add_person
 
 
 @pytest.mark.unit
-def test_add_movement():
-    pk = "joe@doe.com"
-    data = {"name": "Joe Doe", "role": "Salesman", "dept": "Sales"}
+def test_add_movement(fictional_person_data):
+    data = fictional_person_data
+    session = get_session()
 
-    db = connect()
+    for person in data:
+        add_person(session, person)
+        session.commit()
 
-    _, created = add_person(db, Person(pk=pk, **data))
-    assert created is True
+    add(Decimal(-30), email="joe@doe.com")
+    add(Decimal(90), dept="Security")
 
-    pk = "jim@doe.com"
-    data = {"name": "Jim Doe", "role": "Manager", "dept": "Management"}
+    with session:
+        result = session.exec(
+            select(Balance).where(Balance.person == data[0])
+        ).fetchall()
 
-    _, created = add_person(db, Person(pk=pk, **data))
-    assert created is True
+        assert result[0].value == Decimal(70)
 
-    commit(db)
+        result = session.exec(
+            select(Balance).where(Balance.person == data[1])
+        ).fetchall()
 
-    add(-30, email="joe@doe.com")
-    add(90, dept="Management")
-
-    db = connect()
-
-    assert db[Balance].get_by_pk("joe@doe.com").value == 470
-    assert db[Balance].get_by_pk("jim@doe.com").value == 190
+        assert result[0].value == Decimal(590)

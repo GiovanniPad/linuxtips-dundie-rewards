@@ -1,38 +1,25 @@
 import pytest
 
 from dundie.core import read
-from dundie.database import add_person, commit, connect
-from dundie.models import Person
+from dundie.database import get_session
+from dundie.utils.db import add_person
 
 
 @pytest.mark.unit
-def test_read_with_query():
-    pk = "joe@doe.com"
-    data = {"name": "Joe Doe", "role": "Salesman", "dept": "Sales"}
+def test_read_with_query(fictional_person_data):
+    data = fictional_person_data
+    session = get_session()
 
-    db = connect()
+    for person in data:
+        add_person(session=session, instance=person)
+        session.commit()
 
-    _, created = add_person(db, Person(pk=pk, **data))
-    assert created is True
+    result = read()
 
-    pk = "jim@doe.com"
-    data = {"name": "Jim Doe", "role": "Manager", "dept": "Management"}
+    assert len(result) == 2
 
-    _, created = add_person(db, Person(pk=pk, **data))
-    assert created is True
+    result = read(dept="Sales")
+    assert result[0]["name"] == "Joe Doe"
 
-    commit(db)
-
-    response = read()
-
-    assert len(response) == 2
-
-    response = read(dept="Management")
-
-    assert len(response) == 1
-    assert response[0]["name"] == "Jim Doe"
-
-    response = read(email="joe@doe.com")
-
-    assert len(response) == 1
-    assert response[0]["name"] == "Joe Doe"
+    result = read(email="jim@doe.com")
+    assert result[0]["name"] == "Jim Doe"

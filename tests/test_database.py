@@ -1,92 +1,73 @@
 import pytest
+from sqlmodel import select
 
-from dundie.database import (
-    EMPTY_DB,
-    ORM,
-    add_movement,
-    add_person,
-    commit,
-    connect,
-)
-from dundie.models import Balance, InvalidEmailError, Movement, Person
+from dundie.models import Balance, InvalidEmailError, Person
+from dundie.utils.db import add_movement, add_person, get_session
 
 
 @pytest.mark.unit
-def test_database_schema():
-    db = connect()
-    db_keys = {ORM.get_table_name(model) for model in db}
-    assert db_keys == EMPTY_DB.keys()
+def test_commit_to_database(fictional_person_data):
+    session = get_session()
+    data = fictional_person_data[0]
+
+    add_person(session, data)
+    session.commit()
+
+    result = session.exec(
+        select(Person).where(Person.email == data.email)
+    ).first()
+
+    assert result == data
 
 
 @pytest.mark.unit
-def test_commit_to_database():
-    db = connect()
+def test_add_person_for_the_first_time(fictional_person_data):
+    session = get_session()
+    data = fictional_person_data[1]
 
-    pk = "joe@doe.com"
+    _, created = add_person(session, data)
+    session.commit()
 
-    data = {"name": "Joe Doe", "role": "Salesman", "dept": "Sales"}
-
-    db[Person].append(Person(pk=pk, **data))
-
-    commit(db)
-
-    db = connect()
-    assert db[Person].get_by_pk("joe@doe.com").dict() == {"pk": pk, **data}
-
-
-@pytest.mark.unit
-def test_add_person_for_the_first_time():
-    pk = "joe@doe.com"
-    data = {"name": "Joe Doe", "role": "Salesman", "dept": "Sales"}
-
-    person = Person(pk=pk, **data)
-
-    db = connect()
-
-    _, created = add_person(db, person)
+    result = session.exec(
+        select(Person).where(Person.email == data.email)
+    ).first()
 
     assert created is True
-
-    commit(db)
-
-    db = connect()
-
-    assert db[Person].get_by_pk(pk) == person
-    assert db[Balance].get_by_pk(pk).value == 500
-    assert len(db[Movement].filter(person__pk=pk)) > 0
-    assert db[Movement].filter(person__pk=pk).first().value == 500
+    assert result.name == "Jim Doe"
+    assert result.dept == "Security"
+    assert result.role == "Guard"
+    assert result.currency == "USD"
 
 
 @pytest.mark.unit
-def test_negative_add_person_invalid_email():
+def test_negative_add_person_invalid_email(fictional_person_data):
+    session = get_session()
+    data = fictional_person_data[0]
+
+    data.email = ".@bla"
     with pytest.raises(InvalidEmailError):
-        add_person({}, Person(pk=".@bla"))
+        add_person(session, data)
+        session.commit()
 
 
 @pytest.mark.unit
-def test_add_or_remove_points_for_person():
-    pk = "joe@doe.com"
-    data = {"name": "Joe Doe", "role": "Salesman", "dept": "Sales"}
+def test_add_or_remove_points_for_person(fictional_person_data):
+    session = get_session()
+    person = fictional_person_data[1]
 
-    db = connect()
-    person = Person(pk=pk, **data)
-    _, created = add_person(db, person)
+    person, *_ = add_person(session, person)
+    session.commit()
 
-    assert created is True
+    before = person.balance.value
 
-    commit(db)
+    add_movement(session, person, -100, "system")
+    session.commit()
 
-    db = connect()
+    after = (
+        session.exec(select(Balance).where(Balance.person == person))
+        .first()
+        .value
+    )
 
-    before = db[Balance].get_by_pk(pk).value
-
-    add_movement(db, person, -100, "manager")
-    commit(db)
-
-    db = connect()
-
-    after = db[Balance].get_by_pk(pk).value
-
-    assert after == before - 100
-    assert after == 400
     assert before == 500
+    assert after == 400
