@@ -10,11 +10,10 @@ from sqlmodel import select
 from dundie.database import get_session
 from dundie.models import Movement, Person
 from dundie.settings import DATEFMT
+from dundie.utils.auth import authenticate_require, get_permission
 from dundie.utils.db import add_movement, add_person
 from dundie.utils.exchange import get_rates
 from dundie.utils.log import get_logger
-
-from .utils.auth import authenticate_require
 
 log = get_logger()
 
@@ -25,6 +24,14 @@ ResultDict = List[Dict[str, Any]]
 @authenticate_require
 def load(filepath: str, from_person: Person) -> ResultDict:
     """Loads data from filepath to the database"""
+
+    permission = get_permission(from_person, {})
+
+    if not permission:
+        raise PermissionError(
+            "You don't have permission to execute this action"
+        )
+
     try:
         csv_data = reader(open(filepath))
     except FileNotFoundError as e:
@@ -49,9 +56,16 @@ def load(filepath: str, from_person: Person) -> ResultDict:
 
 
 @authenticate_require
-def read(**query: Query) -> ResultDict:
+def read(from_person: Person, **query: Query) -> ResultDict:
     """Read data from db and filters using query"""
     query = {key: value for key, value in query.items() if value is not None}
+
+    permission = get_permission(from_person, query)
+    breakpoint()
+    if not permission:
+        raise PermissionError(
+            "You don't have permission to execute this action"
+        )
 
     return_data = []
     query_statements = []
@@ -93,9 +107,16 @@ def read(**query: Query) -> ResultDict:
 
 
 @authenticate_require
-def add(value: Decimal, **query: Query):
+def add(value: Decimal, from_person: Person, **query: Query):
     """Add value to each record on query."""
     query = {key: value for key, value in query.items() if value is not None}
+
+    permission = get_permission(from_person, query)
+
+    if not permission:
+        raise PermissionError(
+            "You don't have permission to execute this action"
+        )
 
     people = read(**query)
 
