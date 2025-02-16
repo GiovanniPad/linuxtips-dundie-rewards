@@ -7,11 +7,8 @@ from sqlmodel import Field, Relationship, SQLModel
 from typing_extensions import Annotated
 
 from dundie.utils.email import check_valid_email
+from dundie.utils.errors import InvalidEmailError
 from dundie.utils.user import generate_simple_password
-
-
-class InvalidEmailError(Exception):
-    pass
 
 
 class Person(SQLModel, table=True):
