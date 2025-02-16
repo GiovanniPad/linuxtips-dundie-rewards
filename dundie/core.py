@@ -14,13 +14,16 @@ from dundie.utils.db import add_movement, add_person
 from dundie.utils.exchange import get_rates
 from dundie.utils.log import get_logger
 
+from .utils.auth import authenticate_require
+
 log = get_logger()
 
 Query = Dict[str, Any]
 ResultDict = List[Dict[str, Any]]
 
 
-def load(filepath: str) -> ResultDict:
+@authenticate_require
+def load(filepath: str, from_person: Person) -> ResultDict:
     """Loads data from filepath to the database"""
     try:
         csv_data = reader(open(filepath))
@@ -45,6 +48,7 @@ def load(filepath: str) -> ResultDict:
     return people
 
 
+@authenticate_require
 def read(**query: Query) -> ResultDict:
     """Read data from db and filters using query"""
     query = {key: value for key, value in query.items() if value is not None}
@@ -88,6 +92,7 @@ def read(**query: Query) -> ResultDict:
     return return_data
 
 
+@authenticate_require
 def add(value: Decimal, **query: Query):
     """Add value to each record on query."""
     query = {key: value for key, value in query.items() if value is not None}
