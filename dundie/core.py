@@ -22,11 +22,10 @@ ResultDict = List[Dict[str, Any]]
 
 
 @authenticate_require
-def load(filepath: str, from_person: Person) -> ResultDict:
+def load(filepath: str, from_person: Person, command: str) -> ResultDict:
     """Loads data from filepath to the database"""
 
-    permission = get_permission(from_person, {})
-
+    permission = get_permission(from_person, {}, command)
     if not permission:
         raise PermissionError(
             "You don't have permission to execute this action"
@@ -56,12 +55,11 @@ def load(filepath: str, from_person: Person) -> ResultDict:
 
 
 @authenticate_require
-def read(from_person: Person, **query: Query) -> ResultDict:
+def read(from_person: Person, command: str, **query: Query) -> ResultDict:
     """Read data from db and filters using query"""
     query = {key: value for key, value in query.items() if value is not None}
 
-    permission = get_permission(from_person, query)
-    breakpoint()
+    permission = get_permission(from_person, query, command)
     if not permission:
         raise PermissionError(
             "You don't have permission to execute this action"
@@ -107,12 +105,11 @@ def read(from_person: Person, **query: Query) -> ResultDict:
 
 
 @authenticate_require
-def add(value: Decimal, from_person: Person, **query: Query):
+def add(value: Decimal, from_person: Person, command: str, **query: Query):
     """Add value to each record on query."""
     query = {key: value for key, value in query.items() if value is not None}
 
-    permission = get_permission(from_person, query)
-
+    permission = get_permission(from_person, query, command)
     if not permission:
         raise PermissionError(
             "You don't have permission to execute this action"

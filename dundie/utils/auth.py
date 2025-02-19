@@ -6,6 +6,7 @@ from sqlmodel import select
 
 from dundie.database import get_session
 from dundie.models import Person, User
+from dundie.settings import ADMIN_EMAIL
 from dundie.utils.email import check_valid_email
 from dundie.utils.errors import (
     AuthenticationError,
@@ -55,17 +56,39 @@ def authenticate_require(func):
                 ).first()
             user = [user]
 
-        return func(*args, from_person=user[0], **kwargs)
+        command_name = func.__name__
+
+        return func(*args, from_person=user[0], command=command_name, **kwargs)
 
     return wrapper
 
 
-def get_permission(from_person: Person, query: dict[str]):
+def get_permission(from_person: Person, query: dict[str], command):
     person_email = from_person.email
     person_role = from_person.role
+    person_dept = from_person.dept
 
-    if not person_role == "Manager":
-        if query.get("email"):
-            if query["email"] == person_email:
+    query_dept = query.get("dept")
+    query_email = query.get("email")
+
+    admin_commands = ["load", "add"]
+
+    if person_email == ADMIN_EMAIL:
+        return True
+
+    if query_dept and command not in admin_commands:
+        if person_role == "Manager" and person_dept == query_dept:
+            return True
+
+    if query_email and command not in admin_commands:
+        if person_role == "Manager":
+            with get_session() as session:
+                user_dept = session.exec(
+                    select(Person.dept).where(Person.email == query_email)
+                ).first()
+            if user_dept == person_dept:
                 return True
-            return False
+        if query_email == person_email:
+            return True
+
+    return False
