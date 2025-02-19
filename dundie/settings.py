@@ -13,3 +13,5 @@ SQL_CON_STRING: str = f"sqlite:///{DATABASE_PATH}"
 DATEFMT: str = "%d/%m/%Y %H:%M:%S"
 
 API_BASE_URL = "https://economia.awesomeapi.com.br/json/last/USD-{currency}"
+
+ADMIN_EMAIL = "michael@dundermifflin.com"
