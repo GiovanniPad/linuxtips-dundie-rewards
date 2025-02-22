@@ -80,6 +80,27 @@ def show(output, **query):
 
 
 @main.command()
+@click.option("--dept", required=False)
+@click.option("--email", required=False)
+def movements(**query):
+    """Show the movements of user(s)."""
+    result = core.movements(**query)
+
+    table = Table(title="Account Movements")
+    headers = ["email", "name", "dept", "role", "date", "value", "actor"]
+
+    for header in headers:
+        table.add_column(header.capitalize(), style="magenta")
+
+    for movement in result:
+        table.add_row(*[str(value) for value in movement.values()])
+
+    console = Console()
+
+    console.print(table)
+
+
+@main.command()
 @click.argument("value", type=click.INT, required=True)
 @click.option("--dept", required=False)
 @click.option("--email", required=False)
