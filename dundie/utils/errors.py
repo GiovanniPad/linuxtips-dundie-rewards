@@ -8,3 +8,7 @@ class InvalidEmailError(Exception):
 
 class AuthenticationError(Exception):
     pass
+
+
+class InsufficientBalanceError(Exception):
+    pass

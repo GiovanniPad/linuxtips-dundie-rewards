@@ -63,7 +63,9 @@ def authenticate_require(func):
     return wrapper
 
 
-def get_permission(from_person: Person, query: dict[str], command):
+def get_permission(
+    from_person: Person, query: dict[str] = {}, command: str = None
+):
     person_email = from_person.email
     person_role = from_person.role
     person_dept = from_person.dept
@@ -74,6 +76,9 @@ def get_permission(from_person: Person, query: dict[str], command):
     admin_commands = ["load", "add"]
 
     if person_email == ADMIN_EMAIL:
+        return True
+
+    if command == "transfer":
         return True
 
     if query_dept and command not in admin_commands:

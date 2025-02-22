@@ -8,10 +8,11 @@ from typing import Any, Dict, List, cast
 from sqlmodel import select
 
 from dundie.database import get_session
-from dundie.models import Movement, Person
+from dundie.models import Balance, Movement, Person
 from dundie.settings import DATEFMT
 from dundie.utils.auth import authenticate_require, get_permission
 from dundie.utils.db import add_movement, add_person
+from dundie.utils.errors import InsufficientBalanceError
 from dundie.utils.exchange import get_rates
 from dundie.utils.log import get_logger
 
@@ -131,3 +132,34 @@ def add(value: Decimal, from_person: Person, command: str, **query: Query):
             add_movement(session, cast(Person, instance), value, user)
 
         session.commit()
+
+
+@authenticate_require
+def transfer(value: int, to_email: str, from_person: Person, command: str):
+    """Transfer points between users"""
+    permission = get_permission(from_person=from_person, command=command)
+    if not permission:
+        raise PermissionError(
+            "You don't have permission to execute this action"
+        )
+
+    confirmation = None
+    with get_session() as session:
+        sql = select(Balance.value).where(Balance.person == from_person)
+        from_person_balance = session.exec(sql).first()
+
+        if from_person_balance < value:
+            raise InsufficientBalanceError(
+                "You don't have sufficient balance to transfer"
+            )
+
+        add_movement(session, from_person, Decimal(-value), from_person.name)
+
+        sql = select(Person).where(Person.email == to_email)
+        to_person = session.exec(sql).first()
+
+        add_movement(session, to_person, Decimal(value), from_person.name)
+        confirmation = [True, to_person.name]
+        session.commit()
+
+    return confirmation

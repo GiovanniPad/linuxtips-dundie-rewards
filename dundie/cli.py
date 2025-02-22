@@ -103,3 +103,16 @@ def remove(ctx, value, **query):
     core.add(value * -1, **query)
 
     ctx.invoke(show, **query)
+
+
+@main.command()
+@click.argument("value", type=click.INT, required=True)
+@click.option("--to", required=True)
+def transfer(value: int, to: str):
+    """Transfer points to another user."""
+    success, user = core.transfer(value, to_email=to)
+    if success:
+        print(
+            f"Sucesso. {value} pontos transferidos da sua conta "
+            f"para a conta de {user}."
+        )
