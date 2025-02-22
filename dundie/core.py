@@ -2,6 +2,7 @@
 
 import os
 from csv import reader
+from datetime import datetime
 from decimal import Decimal
 from typing import Any, Dict, List, cast
 
@@ -163,3 +164,51 @@ def transfer(value: int, to_email: str, from_person: Person, command: str):
         session.commit()
 
     return confirmation
+
+
+@authenticate_require
+def movements(from_person: Person, command: str, **query: Query):
+    """Show the movements from users."""
+    query = {key: value for key, value in query.items() if value is not None}
+    permission = get_permission(from_person, query, command)
+    if not permission:
+        raise PermissionError(
+            "You don't have permission to execute this action"
+        )
+
+    return_data = []
+    query_statements = []
+
+    if "dept" in query:
+        query_statements.append(Person.dept == query["dept"])
+    if "email" in query:
+        query_statements.append(Person.email == query["email"])
+
+    sql = select(Person)
+
+    if query_statements:
+        sql = sql.where(*query_statements)
+    with get_session() as session:
+        persons = session.exec(sql)
+        for person in persons:
+            sql = select(Movement.date, Movement.value, Movement.actor).where(
+                Movement.person == person
+            )
+            movements: list[tuple[datetime, Decimal, str]] = session.exec(
+                sql
+            ).all()
+
+            for date, value, actor in movements:
+                return_data.append(
+                    {
+                        "email": person.email,
+                        "name": person.name,
+                        "dept": person.dept,
+                        "role": person.role,
+                        "date": date.strftime(DATEFMT),
+                        "value": value,
+                        "actor": actor,
+                    }
+                )
+
+    return return_data
