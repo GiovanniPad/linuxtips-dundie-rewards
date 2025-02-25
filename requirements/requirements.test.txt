@@ -2,6 +2,8 @@ setuptools
 ipython
 pytest
 pytest-forked
+pytest-cov
+coverage
 flake8
 pyproject-flake8
 black
