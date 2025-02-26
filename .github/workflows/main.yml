@@ -52,7 +52,7 @@ jobs:
       - name: Install Project
         run: pip install '.[test]'
       - name: Run tests
-        run: pytest -v --junitxml=test-results.xml --forked
+        run: pytest -v --cov=dundie --junitxml=test-results.xml --forked
       - name: publish junit results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
