@@ -12,7 +12,6 @@ from dundie.utils.user import generate_simple_password
 
 
 class Person(SQLModel, table=True):
-
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     email: str = Field(
         nullable=False, index=True, sa_column_kwargs={"unique": True}
@@ -28,16 +27,13 @@ class Person(SQLModel, table=True):
 
     @field_validator("email")
     def validate_email(cls, v: str) -> str:
-
         if not check_valid_email(v):
-
             raise InvalidEmailError(f"Invalid email for {v!r}")
 
         return v
 
 
 class Balance(SQLModel, table=True):
-
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     person_id: int = Field(
         foreign_key="person.id", sa_column_kwargs={"unique": True}
@@ -52,7 +48,6 @@ class Balance(SQLModel, table=True):
 
 
 class Movement(SQLModel, table=True):
-
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     person_id: int = Field(foreign_key="person.id")
     actor: str = Field(nullable=False, index=True)
@@ -63,7 +58,6 @@ class Movement(SQLModel, table=True):
 
 
 class User(SQLModel, table=True):
-
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
 
     person_id: int = Field(

@@ -24,7 +24,6 @@ def send_email(from_, to, subject, text):
         with smtplib.SMTP(
             host=SMTP_HOST, port=SMTP_PORT, timeout=SMTP_TIMEOUT
         ) as server:
-
             message = MIMEText(text)
 
             message["Subject"] = subject

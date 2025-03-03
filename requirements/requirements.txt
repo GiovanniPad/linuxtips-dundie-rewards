@@ -1,9 +1,0 @@
-setuptools
-click
-rich
-rich-click
-pydantic
-sqlalchemy
-sqlmodel
-alembic
-httpx
