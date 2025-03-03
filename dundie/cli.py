@@ -37,7 +37,6 @@ def load(filepath):
 
     result = core.load(filepath)
     for person in result:
-
         table.add_row(*[str(value) for value in person.values()])
 
     console = Console()
@@ -55,9 +54,7 @@ def show(output, **query):
     result = core.read(**query)
 
     if output:
-
         with open(output, "w") as output_file:
-
             output_file.write(json.dumps(result))
 
     if not result:
@@ -66,12 +63,11 @@ def show(output, **query):
     table = Table(title="Dunder Mifflin Associates")
 
     for key in result[0]:
-
         table.add_column(key.title().replace("_", ""), style="magenta")
 
     for person in result:
-        person["value"] = f"{person["value"]:.2f}"
-        person["balance"] = f"{person["balance"]:.2f}"
+        person["value"] = f"{person['value']:.2f}"
+        person["balance"] = f"{person['balance']:.2f}"
         table.add_row(*[str(value) for value in person.values()])
 
     console = Console()
@@ -134,6 +130,5 @@ def transfer(value: int, to: str):
     success, user = core.transfer(value, to_email=to)
     if success:
         print(
-            f"Sucesso. {value} pontos transferidos da sua conta "
-            f"para a conta de {user}."
+            f"Sucesso. {value} pontos transferidos da sua conta para a conta de {user}."
         )
