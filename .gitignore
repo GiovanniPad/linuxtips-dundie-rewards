@@ -166,3 +166,5 @@ cython_debug/
 
 # Ignore VSCode configuration
 .vscode
+
+.ruff_cache

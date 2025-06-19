@@ -2,7 +2,6 @@ from decimal import Decimal
 
 import pytest
 from sqlmodel import select
-
 from dundie.core import add
 from dundie.database import get_session
 from dundie.models import Balance
@@ -10,8 +9,8 @@ from dundie.utils.db import add_person
 
 
 @pytest.mark.unit
-def test_add_movement(fictional_person_data):
-    data = fictional_person_data
+def test_add_movement(fictional_data):
+    data = fictional_data
     session = get_session()
 
     for person in data:

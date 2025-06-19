@@ -15,3 +15,5 @@ DATEFMT: str = "%d/%m/%Y %H:%M:%S"
 API_BASE_URL = "https://economia.awesomeapi.com.br/json/last/USD-{currency}"
 
 ADMIN_EMAIL = "michael@dundermifflin.com"
+KEYRING_SERVICE_NAME = "Dundie"
+KEYRING_USERNAME = "logged_user"

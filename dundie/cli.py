@@ -4,6 +4,8 @@ from importlib.metadata import metadata
 import rich_click as click
 from rich.console import Console
 from rich.table import Table
+from getpass import getpass
+from dundie.utils.email import check_valid_email
 
 from dundie import core
 
@@ -132,3 +134,33 @@ def transfer(value: int, to: str):
         print(
             f"Sucesso. {value} pontos transferidos da sua conta para a conta de {user}."
         )
+
+
+@main.command()
+@click.argument("email", type=click.STRING, required=True)
+def login(email: str):
+    """Use to login/authenticate your user and use commands."""
+
+    if not check_valid_email(email):
+        click.secho(f"'{email}'", nl=False)
+        click.secho(" is not valid. Please insert a valid email.", fg="red")
+        return
+
+    password = getpass()
+    logged_on = core.login(email.strip(), password.strip())
+
+    if logged_on:
+        click.secho("Logged in successfully!", fg="green")
+    else:
+        click.secho("Invalid credentials.", fg="red")
+
+
+@main.command()
+def logout():
+    """Use to logout your account."""
+    logged_out = core.logout()
+
+    if logged_out:
+        click.secho("Logged out succesfully!", fg="green")
+    else:
+        click.secho("You need to be logged in to log out.", fg="red")

@@ -11,7 +11,9 @@ from dundie.utils.email import check_valid_email, send_email
 session = get_session()
 
 
-def add_person(session: Session, instance: Person):
+def add_person(
+    session: Session, instance: Person, password: str | None = None
+):
     """Saves person data to database.
 
     - Email is unique (resolved by dictionary hash table)
@@ -33,7 +35,7 @@ def add_person(session: Session, instance: Person):
         session.add(instance)
         set_initial_balance(session, instance)
 
-        password = set_initial_password(session, instance)
+        password = set_initial_password(session, instance, password)
 
         # TODO: encrypt and send only link not raw password
         # TODO: Usar sistema de filas (conteúdo extra)
@@ -54,9 +56,14 @@ def add_person(session: Session, instance: Person):
         return instance, created
 
 
-def set_initial_password(session: Session, instance: Person) -> str:
+def set_initial_password(
+    session: Session, instance: Person, password: str | None = None
+) -> str:
     """Generated and saves password."""
     user = User(person=instance)
+    if password is not None:
+        user.password = password
+
     session.add(user)
     return user.password
 

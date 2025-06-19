@@ -6,9 +6,9 @@ from dundie.utils.db import add_movement, add_person, get_session
 
 
 @pytest.mark.unit
-def test_commit_to_database(fictional_person_data):
+def test_commit_to_database(fictional_data):
     session = get_session()
-    data = fictional_person_data[0]
+    data = fictional_data[0]
 
     add_person(session, data)
     session.commit()
@@ -21,9 +21,9 @@ def test_commit_to_database(fictional_person_data):
 
 
 @pytest.mark.unit
-def test_add_person_for_the_first_time(fictional_person_data):
+def test_add_person_for_the_first_time(fictional_data):
     session = get_session()
-    data = fictional_person_data[1]
+    data = fictional_data[1]
 
     _, created = add_person(session, data)
     session.commit()
@@ -40,9 +40,9 @@ def test_add_person_for_the_first_time(fictional_person_data):
 
 
 @pytest.mark.unit
-def test_negative_add_person_invalid_email(fictional_person_data):
+def test_negative_add_person_invalid_email(fictional_data):
     session = get_session()
-    data = fictional_person_data[0]
+    data = fictional_data[0]
 
     data.email = ".@bla"
     with pytest.raises(InvalidEmailError):
@@ -51,9 +51,9 @@ def test_negative_add_person_invalid_email(fictional_person_data):
 
 
 @pytest.mark.unit
-def test_add_or_remove_points_for_person(fictional_person_data):
+def test_add_or_remove_points_for_person(fictional_data):
     session = get_session()
-    person = fictional_person_data[1]
+    person = fictional_data[1]
 
     person, *_ = add_person(session, person)
     session.commit()

@@ -5,13 +5,13 @@ from csv import reader
 from datetime import datetime
 from decimal import Decimal
 from typing import Any, Dict, List, cast
-
+import keyring
+from dundie.settings import KEYRING_SERVICE_NAME, KEYRING_USERNAME
 from sqlmodel import select
-
 from dundie.database import get_session
-from dundie.models import Balance, Movement, Person
+from dundie.models import Balance, Movement, Person, User
 from dundie.settings import DATEFMT
-from dundie.utils.auth import authenticate_require, get_permission
+from dundie.utils.auth import login_required
 from dundie.utils.db import add_movement, add_person
 from dundie.utils.errors import InsufficientBalanceError
 from dundie.utils.exchange import get_rates
@@ -23,15 +23,9 @@ Query = Dict[str, Any]
 ResultDict = List[Dict[str, Any]]
 
 
-@authenticate_require
-def load(filepath: str, from_person: Person, command: str) -> ResultDict:
+@login_required
+def load(filepath: str, from_person: Person) -> ResultDict:
     """Loads data from filepath to the database"""
-
-    permission = get_permission(from_person, {}, command)
-    if not permission:
-        raise PermissionError(
-            "You don't have permission to execute this action"
-        )
 
     try:
         csv_data = reader(open(filepath))
@@ -56,16 +50,10 @@ def load(filepath: str, from_person: Person, command: str) -> ResultDict:
     return people
 
 
-@authenticate_require
-def read(from_person: Person, command: str, **query: Query) -> ResultDict:
+@login_required
+def read(from_person: Person, **query: Query) -> ResultDict:
     """Read data from db and filters using query"""
     query = {key: value for key, value in query.items() if value is not None}
-
-    permission = get_permission(from_person, query, command)
-    if not permission:
-        raise PermissionError(
-            "You don't have permission to execute this action"
-        )
 
     return_data = []
     query_statements = []
@@ -106,16 +94,10 @@ def read(from_person: Person, command: str, **query: Query) -> ResultDict:
     return return_data
 
 
-@authenticate_require
-def add(value: Decimal, from_person: Person, command: str, **query: Query):
+@login_required
+def add(value: Decimal, from_person: Person, **query: Query):
     """Add value to each record on query."""
     query = {key: value for key, value in query.items() if value is not None}
-
-    permission = get_permission(from_person, query, command)
-    if not permission:
-        raise PermissionError(
-            "You don't have permission to execute this action"
-        )
 
     people = read(**query)
 
@@ -135,14 +117,9 @@ def add(value: Decimal, from_person: Person, command: str, **query: Query):
         session.commit()
 
 
-@authenticate_require
-def transfer(value: int, to_email: str, from_person: Person, command: str):
+@login_required
+def transfer(value: int, to_email: str, from_person: Person):
     """Transfer points between users"""
-    permission = get_permission(from_person=from_person, command=command)
-    if not permission:
-        raise PermissionError(
-            "You don't have permission to execute this action"
-        )
 
     confirmation = None
     with get_session() as session:
@@ -166,15 +143,10 @@ def transfer(value: int, to_email: str, from_person: Person, command: str):
     return confirmation
 
 
-@authenticate_require
-def movements(from_person: Person, command: str, **query: Query):
+@login_required
+def movements(from_person: Person, **query: Query):
     """Show the movements from users."""
     query = {key: value for key, value in query.items() if value is not None}
-    permission = get_permission(from_person, query, command)
-    if not permission:
-        raise PermissionError(
-            "You don't have permission to execute this action"
-        )
 
     return_data = []
     query_statements = []
@@ -212,3 +184,29 @@ def movements(from_person: Person, command: str, **query: Query):
                 )
 
     return return_data
+
+
+def login(email: str, password: str):
+    sql = (
+        select(Person, User.password)
+        .join(User, Person.id == User.person_id)
+        .where(Person.email == email)
+    )
+
+    with get_session() as session:
+        user = session.exec(sql).first()
+
+    if not user or password != user[1]:
+        return False
+
+    user = user[0]
+    keyring.set_password(KEYRING_SERVICE_NAME, KEYRING_USERNAME, user.email)
+    return True
+
+
+def logout():
+    logged = keyring.get_password(KEYRING_SERVICE_NAME, KEYRING_USERNAME)
+    if logged:
+        keyring.delete_password(KEYRING_SERVICE_NAME, KEYRING_USERNAME)
+        return True
+    return False

@@ -1,64 +1,42 @@
-import os
+import keyring
 from functools import wraps
-from getpass import getpass
-
 from sqlmodel import select
-
 from dundie.database import get_session
-from dundie.models import Person, User
-from dundie.settings import ADMIN_EMAIL
-from dundie.utils.email import check_valid_email
-from dundie.utils.errors import (
-    AuthenticationError,
-    InvalidEmailError,
-    UserNotFoundError,
-)
+from dundie.models import Person
+import click
+from dundie.settings import ADMIN_EMAIL, KEYRING_USERNAME, KEYRING_SERVICE_NAME
 
 
-def authenticate_require(func):
+def login_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if not os.getenv("AUTHENTICATED"):
-            email = input("Email: ").strip()
-
-            if not check_valid_email(email):
-                raise InvalidEmailError(
-                    f"{email} is not valid. Please insert a valid email."
-                )
-
-            sql = (
-                select(Person, User.password)
-                .join(User, Person.id == User.person_id)
-                .where(Person.email == email)
-            )
-
+        logged = keyring.get_password(KEYRING_SERVICE_NAME, KEYRING_USERNAME)
+        if logged:
             with get_session() as session:
+                sql = select(Person).where(Person.email == logged)
                 user = session.exec(sql).first()
 
-            if not user:
-                raise UserNotFoundError("User not found.")
+                if not user:
+                    click.secho(
+                        "User doesn't exists! Try login again", fg="red"
+                    )
+                    exit()
 
-            password = getpass().strip()
+                permission = get_permission(user, kwargs, func.__name__)
 
-            if not password == user[1]:
-                raise AuthenticationError("Invalid credentials.")
+                if not permission:
+                    click.secho(
+                        "You don't have permission to use this command",
+                        fg="red",
+                    )
+                    exit()
 
-            user = list(user)
-            user.pop()
-
-            os.environ["AUTHENTICATED"] = "yes"
-            os.environ["AUTHENTICATED_USER"] = user[0].email
+                return func(*args, from_person=user, **kwargs)
         else:
-            email = os.getenv("AUTHENTICATED_USER")
-            with get_session() as session:
-                user = session.exec(
-                    select(Person).where(Person.email == email)
-                ).first()
-            user = [user]
-
-        command_name = func.__name__
-
-        return func(*args, from_person=user[0], command=command_name, **kwargs)
+            click.secho(
+                "You need to be logged in to use this command!", fg="red"
+            )
+            exit()
 
     return wrapper
 
@@ -75,15 +53,16 @@ def get_permission(
 
     admin_commands = ["load", "add"]
 
-    if person_email == ADMIN_EMAIL:
+    if person_email == ADMIN_EMAIL or command == "transfer":
         return True
 
-    if command == "transfer":
+    if (
+        query_dept
+        and (command not in admin_commands)
+        and (person_role == "Manager")
+        and (person_dept == query_dept)
+    ):
         return True
-
-    if query_dept and command not in admin_commands:
-        if person_role == "Manager" and person_dept == query_dept:
-            return True
 
     if query_email and command not in admin_commands:
         if person_role == "Manager":

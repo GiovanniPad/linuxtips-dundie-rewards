@@ -6,8 +6,8 @@ from dundie.utils.db import add_person
 
 
 @pytest.mark.unit
-def test_read_with_query(fictional_person_data):
-    data = fictional_person_data
+def test_read_with_query(fictional_data):
+    data = fictional_data
     session = get_session()
 
     for person in data:
@@ -16,7 +16,7 @@ def test_read_with_query(fictional_person_data):
 
     result = read()
 
-    assert len(result) == 2
+    assert len(result) == 3
 
     result = read(dept="Sales")
     assert result[0]["name"] == "Joe Doe"
